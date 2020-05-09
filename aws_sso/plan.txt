@@ -26,8 +26,7 @@
 
 # optional export credentials to env_vars
 
-# verify credentials
-
+# optional external credential provider
 
 # optional:
 #  -p <aws_profile_name>
