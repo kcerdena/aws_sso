@@ -1,4 +1,5 @@
 import json
+import configparser
 from datetime import datetime, timezone
 from dateutil import parser
 from pathlib import Path
@@ -37,5 +38,16 @@ def __is_not_expired(expires_at):
     return expiration_date > datetime.now(timezone.utc)
 
 
-def write_credentials(credentials_file='~/.aws/credentials'):
-    print('todo: write credentials')
+def get_credentials_config(credentials_file='~/.aws/credentials'):
+    config = configparser.ConfigParser(default_section='default')
+    p = Path(credentials_file).expanduser()
+    if p.exists() and p.is_file():
+        with p.open() as f:
+            config.read_file(f)
+    return config
+
+
+def write_credentials_config(config, credentials_file='~/.aws/credentials'):
+    p = Path(credentials_file).expanduser()
+    with p.open(mode='w') as f:
+        config.write(f)

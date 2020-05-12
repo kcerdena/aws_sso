@@ -57,7 +57,7 @@ def __select_role(account_id, role_list):
     for role in role_list:
         x += 1
         role_name = role['roleName']
-        print(f"[{x}] {role_name} arn:aws:iam::{account_id}:role/{role_name}")
+        print(f"[{x}] {role_name} {get_role_arn(account_id, role_name)}")
     index = __select_entry(x) - 1
     return role_list[index]
 
@@ -76,10 +76,24 @@ def __select_entry(max_value):
     return selection
 
 
-def get_role_credentials(access_token, account_id, role_name):
+def get_role_credentials(access_token, role_arn):
+    account_role = parse_role_arn(role_arn)
     response = client.get_role_credentials(
         accessToken=access_token,
-        accountId=account_id,
-        roleName=role_name
+        accountId=account_role['account_id'],
+        roleName=account_role['role_name']
     )
+    response['roleCredentials']['role_arn'] = role_arn
     return response['roleCredentials']
+
+
+def get_role_arn(account_id, role_name):
+    return f'arn:aws:iam::{account_id}:role/{role_name}'
+
+
+def parse_role_arn(role_arn):
+    arn_parts = role_arn.split(':')
+    return {
+        'account_id': arn_parts[4],
+        'role_name': arn_parts[5].lstrip('role/')
+    }

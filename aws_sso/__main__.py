@@ -10,7 +10,7 @@ def main(args):
     if args['no_store_creds']:
         pass
     else:
-        credentials.store_session_credentials(args['store_profile'])
+        credentials.store_default_role_session_credentials(cred)
     if args['env_vars']:
         credentials.print_export_strings(cred)
     if args['external_source']:
@@ -26,8 +26,6 @@ if __name__ == '__main__':
                         help='RoleArn for session credentials')
     parser.add_argument('-ns', '--no-store-creds', action='store_true',
                         help='Disable output of session credential to ~/.aws/credentials')
-    parser.add_argument('-sp', '--store-profile',
-                        help='Named profile to store session credentials under')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-env', '--env_vars', action='store_true',
                        help='Output session credential environment variable export strings')

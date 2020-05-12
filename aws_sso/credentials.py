@@ -1,30 +1,23 @@
 import json
+import configparser
 from datetime import datetime
 from . import file_handler
 from . import sso_util
 
 
-def get_role_session_credentials(profile, role_arn=None):
-    access_token = __get_access_token(profile)
+def get_role_session_credentials(sso_profile, role_arn=None):
+    access_token = __get_access_token(sso_profile)
     if role_arn is None:
         account_id = sso_util.get_account_id(access_token)
         role_name = sso_util.get_role_name(access_token, account_id)
-        credentials = sso_util.get_role_credentials(
-            access_token,
-            account_id,
-            role_name
-        )
-    else:
-        account_role = __parse_role_arn(role_arn)
-        credentials = sso_util.get_role_credentials(
-            access_token,
-            account_role['account_id'],
-            account_role['role_name']
-        )
-    return credentials
+        role_arn = sso_util.get_role_arn(account_id, role_name)
+    return sso_util.get_role_credentials(
+        access_token,
+        role_arn
+    )
 
 
-def __get_access_token(profile):
+def __get_access_token(sso_profile):
     count = 0
     while True:
         try:
@@ -36,16 +29,21 @@ def __get_access_token(profile):
                 raise Exception('Unable to retrieve SSO Access Token')
             else:
                 count += 1
-                sso_util.exec_login(profile)
+                sso_util.exec_login(sso_profile)
                 continue
 
 
-def __parse_role_arn(role_arn):
-    arn_parts = role_arn.split(':')
-    return {
-        'account_id': arn_parts[4],
-        'role_name': arn_parts[5].lstrip('role/')
-    }
+def store_default_role_session_credentials(cred):
+    config = __get_default_credentials_config(cred)
+    file_handler.write_credentials_config(config)
+
+
+def __get_default_credentials_config(cred):
+    config = file_handler.get_credentials_config()
+    config['default']['aws_access_key_id'] = cred['accessKeyId']
+    config['default']['aws_secret_access_key'] = cred['secretAccessKey']
+    config['default']['aws_session_token'] = cred['sessionToken']
+    return config
 
 
 def print_export_strings(cred):
@@ -55,17 +53,6 @@ def print_export_strings(cred):
     print(f"export AWS_ACCESS_KEY_ID='{access_key_id}'")
     print(f"export AWS_SECRET_ACCESS_KEY='{secret_access_key}'")
     print(f"export AWS_SESSION_TOKEN='{session_token}'")
-
-
-def store_session_credentials(profile=None):
-    print('todo: store session credentials')
-    if profile is None:
-        # store creds in default
-        pass
-    else:
-        # store credential process in profile
-        # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sourcing-external.html
-        pass
 
 
 def print_credentials(cred):
@@ -78,3 +65,12 @@ def print_credentials(cred):
         'Expiration': expiration_date.isoformat()
     }
     print(json.dumps(spec, separators=(',', ':')))
+
+
+# def __set_external_provider_profile_config(config, sso_profile, cred):
+#     # this goes in the config file
+#     account_role = sso_util.parse_role_arn(cred['role_arn'])
+#     profile_name = f"{account_role['account_id']}_{account_role['role_name']}"
+#     config[profile_name]['credential_process '] = ''
+
+#     exec_string = f"python -m aws_sso -p {sso_profile} -r {cred['role_arn']} -ns -ext"
