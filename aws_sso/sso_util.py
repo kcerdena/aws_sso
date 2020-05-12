@@ -1,22 +1,21 @@
 import subprocess
 import boto3
+from . import helper
 
 client = boto3.client('sso')
 
 
-def exec_login(profile):
-    return subprocess.run([f'aws sso login --profile {profile}'], shell=True, check=True, capture_output=True)
+def exec_login(sso_profile):
+    return subprocess.run([f'aws sso login --profile {sso_profile}'], shell=True, check=True, capture_output=True)
 
 
-def test_access_token(access_token):
-    client.list_accounts(accessToken=access_token)
+def get_account_list(access_token):
+    response = client.list_accounts(accessToken=access_token)
+    return response['accountList']
 
 
 def get_account_id(access_token):
-    response = client.list_accounts(
-        accessToken=access_token
-    )
-    account_list = response['accountList']
+    account_list = get_account_list(access_token)
     if len(account_list) == 0:
         raise Exception('No accounts found')
     elif len(account_list) == 1:
@@ -57,7 +56,8 @@ def __select_role(account_id, role_list):
     for role in role_list:
         x += 1
         role_name = role['roleName']
-        print(f"[{x}] {role_name} {get_role_arn(account_id, role_name)}")
+        role_arn = helper.get_role_arn(account_id, role_name)
+        print(f"[{x}] {role_name} {role_arn}")
     index = __select_entry(x) - 1
     return role_list[index]
 
@@ -77,23 +77,12 @@ def __select_entry(max_value):
 
 
 def get_role_credentials(access_token, role_arn):
-    account_role = parse_role_arn(role_arn)
+    account_id = helper.parse_role_arn(role_arn)['account_id']
+    role_name = helper.parse_role_arn(role_arn)['role_name']
     response = client.get_role_credentials(
         accessToken=access_token,
-        accountId=account_role['account_id'],
-        roleName=account_role['role_name']
+        accountId=account_id,
+        roleName=role_name
     )
     response['roleCredentials']['role_arn'] = role_arn
     return response['roleCredentials']
-
-
-def get_role_arn(account_id, role_name):
-    return f'arn:aws:iam::{account_id}:role/{role_name}'
-
-
-def parse_role_arn(role_arn):
-    arn_parts = role_arn.split(':')
-    return {
-        'account_id': arn_parts[4],
-        'role_name': arn_parts[5].lstrip('role/')
-    }

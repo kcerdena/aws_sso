@@ -1,8 +1,8 @@
 import json
 import configparser
-from datetime import datetime
 from . import file_handler
 from . import sso_util
+from . import helper
 
 
 def get_role_session_credentials(sso_profile, role_arn=None):
@@ -10,7 +10,7 @@ def get_role_session_credentials(sso_profile, role_arn=None):
     if role_arn is None:
         account_id = sso_util.get_account_id(access_token)
         role_name = sso_util.get_role_name(access_token, account_id)
-        role_arn = sso_util.get_role_arn(account_id, role_name)
+        role_arn = helper.get_role_arn(account_id, role_name)
     return sso_util.get_role_credentials(
         access_token,
         role_arn
@@ -22,7 +22,8 @@ def __get_access_token(sso_profile):
     while True:
         try:
             access_token = file_handler.get_sso_access_token()
-            sso_util.test_access_token(access_token)
+            # Verify access token is still valid
+            sso_util.get_account_list(access_token)
             return access_token
         except:
             if count >= 1:
@@ -56,7 +57,7 @@ def print_export_strings(cred):
 
 
 def print_credentials(cred):
-    expiration_date = datetime.fromtimestamp(cred['expiration'] / 1e3)
+    expiration_date = helper.int_to_datetime(cred['expiration'])
     spec = {
         'Version': 1,
         'AccessKeyId': cred['accessKeyId'],

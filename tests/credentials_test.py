@@ -8,7 +8,7 @@ def test_should_retrieve_creds_without_access_token(mocker):
     mocker.patch.object(credentials, 'file_handler')
     mocker.patch.object(credentials, 'sso_util')
     credentials.file_handler.get_sso_access_token.side_effect = ['BADTOKEN', 'GOODTOKEN']
-    credentials.sso_util.test_access_token.side_effect = mock_test_access_token_response
+    credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
     credentials.sso_util.get_role_credentials.side_effect = mock_get_role_credentials_response
     role_arn = 'arn:aws:iam::111111111111:role/ReadOnly'
 
@@ -16,8 +16,8 @@ def test_should_retrieve_creds_without_access_token(mocker):
 
     assert cred == get_cred()
     assert credentials.file_handler.get_sso_access_token.call_count == 2 #pylint: disable=no-member
-    assert credentials.sso_util.test_access_token.call_count == 2 #pylint: disable=no-member
-    credentials.sso_util.test_access_token.assert_called_with('GOODTOKEN') #pylint: disable=no-member
+    assert credentials.sso_util.get_account_list.call_count == 2 #pylint: disable=no-member
+    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN') #pylint: disable=no-member
     assert credentials.sso_util.exec_login.call_count == 1 #pylint: disable=no-member
     credentials.sso_util.exec_login.assert_called_with('sso-profile') #pylint: disable=no-member
     assert credentials.sso_util.get_account_id.call_count == 0 #pylint: disable=no-member
@@ -31,10 +31,9 @@ def test_should_retrieve_creds_without_role_arn(mocker):
     mocker.patch.object(credentials, 'file_handler')
     mocker.patch.object(credentials, 'sso_util')
     credentials.file_handler.get_sso_access_token.side_effect = ['BADTOKEN', 'GOODTOKEN']
-    credentials.sso_util.test_access_token.side_effect = mock_test_access_token_response
+    credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
     credentials.sso_util.get_account_id.side_effect = mock_get_account_id
     credentials.sso_util.get_role_name.side_effect = mock_get_role_name
-    credentials.sso_util.get_role_arn.side_effect = mock_get_role_arn
     credentials.sso_util.get_role_credentials.side_effect = mock_get_role_credentials_response
     role_arn = 'arn:aws:iam::111111111111:role/ReadOnly'
 
@@ -42,16 +41,14 @@ def test_should_retrieve_creds_without_role_arn(mocker):
 
     assert cred == get_cred()
     assert credentials.file_handler.get_sso_access_token.call_count == 2 #pylint: disable=no-member
-    assert credentials.sso_util.test_access_token.call_count == 2 #pylint: disable=no-member
-    credentials.sso_util.test_access_token.assert_called_with('GOODTOKEN') #pylint: disable=no-member
+    assert credentials.sso_util.get_account_list.call_count == 2 #pylint: disable=no-member
+    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN') #pylint: disable=no-member
     assert credentials.sso_util.exec_login.call_count == 1 #pylint: disable=no-member
     credentials.sso_util.exec_login.assert_called_with('sso-profile') #pylint: disable=no-member
     assert credentials.sso_util.get_account_id.call_count == 1 #pylint: disable=no-member
     credentials.sso_util.get_account_id.assert_called_with('GOODTOKEN') #pylint: disable=no-member
     assert credentials.sso_util.get_role_name.call_count == 1 #pylint: disable=no-member
     credentials.sso_util.get_role_name.assert_called_with('GOODTOKEN', '111111111111') #pylint: disable=no-member
-    assert credentials.sso_util.get_role_arn.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.get_role_arn.assert_called_with('111111111111', 'ReadOnly') #pylint: disable=no-member
     assert credentials.sso_util.get_role_credentials.call_count == 1 #pylint: disable=no-member
     credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn) #pylint: disable=no-member
 
@@ -98,7 +95,7 @@ def test_should_print_external_credential_process_to_stdout(capsys):
     cred = get_cred()
     credentials.print_credentials(cred)
     captured = capsys.readouterr()
-    assert captured.out == '{"Version":1,"AccessKeyId":"ASIAXXXXXXXXXXXXXXXX","SecretAccessKey":"SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","SessionToken":"SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg=","Expiration":"2020-05-11T21:44:21"}\n'
+    assert captured.out == '{"Version":1,"AccessKeyId":"ASIAXXXXXXXXXXXXXXXX","SecretAccessKey":"SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","SessionToken":"SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg=","Expiration":"2020-05-12T04:44:21+00:00"}\n'
 
 
 def test_should_store_external_credential_process_config():
