@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="aws_sso-kcerdena",
+    name="aws-sso-credential-provider",
     version="0.0.3",
     author="Kacey Cerdena",
     author_email="6180729+kcerdena@users.noreply.github.com",
