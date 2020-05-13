@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aws_sso-kcerdena",
-    version="0.0.1",
+    version="0.0.2",
     author="Kacey Cerdena",
     author_email="kacey.cerdena@outlook.com",
     description="Session credential provider for AWS SSO roles",
