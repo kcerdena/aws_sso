@@ -18,5 +18,9 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: POSIX",
     ],
+    install_requires=[
+        'python-dateutil>=2.8',
+        'boto3>=1.13'
+    ],
     python_requires='>=3.7',
 )
