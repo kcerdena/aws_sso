@@ -67,11 +67,3 @@ def print_credentials(cred):
     }
     print(json.dumps(spec, separators=(',', ':')))
 
-
-# def __set_external_provider_profile_config(config, sso_profile, cred):
-#     # this goes in the config file
-#     account_role = sso_util.parse_role_arn(cred['role_arn'])
-#     profile_name = f"{account_role['account_id']}_{account_role['role_name']}"
-#     config[profile_name]['credential_process '] = ''
-
-#     exec_string = f"python -m aws_sso -p {sso_profile} -r {cred['role_arn']} -ns -ext"

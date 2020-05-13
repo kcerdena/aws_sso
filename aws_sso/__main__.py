@@ -46,4 +46,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
     main(vars(args))
 
-# /mnt/e/wsl/github/aws_sso/.venv/bin/python -m /home/kacey/wsl/github/aws_sso/aws_sso -p cnect -r arn:aws:iam::105169495512:role/ViewOnlyAccess -ns -ext
