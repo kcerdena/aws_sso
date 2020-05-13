@@ -1,5 +1,4 @@
 pytest
 pytest-mock
 python-dateutil
-boto3
-rope
+boto3>=1.10.13
