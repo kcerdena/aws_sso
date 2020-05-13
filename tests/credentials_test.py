@@ -1,7 +1,6 @@
-import pytest
-import pytest_mock
 import configparser
 from aws_sso import credentials
+from botocore.exceptions import ParamValidationError
 
 
 def test_should_retrieve_creds_without_access_token(mocker):
@@ -15,16 +14,16 @@ def test_should_retrieve_creds_without_access_token(mocker):
     cred = credentials.get_role_session_credentials('sso-profile', role_arn)
 
     assert cred == get_cred()
-    assert credentials.file_handler.get_sso_access_token.call_count == 2 #pylint: disable=no-member
-    assert credentials.sso_util.get_account_list.call_count == 2 #pylint: disable=no-member
-    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN') #pylint: disable=no-member
-    assert credentials.sso_util.exec_login.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.exec_login.assert_called_with('sso-profile') #pylint: disable=no-member
-    assert credentials.sso_util.get_account_id.call_count == 0 #pylint: disable=no-member
-    assert credentials.sso_util.get_role_name.call_count == 0 #pylint: disable=no-member
-    assert credentials.sso_util.get_role_arn.call_count == 0 #pylint: disable=no-member
-    assert credentials.sso_util.get_role_credentials.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn) #pylint: disable=no-member
+    assert credentials.file_handler.get_sso_access_token.call_count == 2
+    assert credentials.sso_util.get_account_list.call_count == 2
+    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN')
+    assert credentials.sso_util.exec_login.call_count == 1
+    credentials.sso_util.exec_login.assert_called_with('sso-profile')
+    assert credentials.sso_util.get_account_id.call_count == 0
+    assert credentials.sso_util.get_role_name.call_count == 0
+    assert credentials.sso_util.get_role_arn.call_count == 0
+    assert credentials.sso_util.get_role_credentials.call_count == 1
+    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn)
 
 
 def test_should_retrieve_creds_without_role_arn(mocker):
@@ -40,17 +39,17 @@ def test_should_retrieve_creds_without_role_arn(mocker):
     cred = credentials.get_role_session_credentials('sso-profile')
 
     assert cred == get_cred()
-    assert credentials.file_handler.get_sso_access_token.call_count == 2 #pylint: disable=no-member
-    assert credentials.sso_util.get_account_list.call_count == 2 #pylint: disable=no-member
-    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN') #pylint: disable=no-member
-    assert credentials.sso_util.exec_login.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.exec_login.assert_called_with('sso-profile') #pylint: disable=no-member
-    assert credentials.sso_util.get_account_id.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.get_account_id.assert_called_with('GOODTOKEN') #pylint: disable=no-member
-    assert credentials.sso_util.get_role_name.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.get_role_name.assert_called_with('GOODTOKEN', '111111111111') #pylint: disable=no-member
-    assert credentials.sso_util.get_role_credentials.call_count == 1 #pylint: disable=no-member
-    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn) #pylint: disable=no-member
+    assert credentials.file_handler.get_sso_access_token.call_count == 2
+    assert credentials.sso_util.get_account_list.call_count == 2
+    credentials.sso_util.get_account_list.assert_called_with('GOODTOKEN')
+    assert credentials.sso_util.exec_login.call_count == 1
+    credentials.sso_util.exec_login.assert_called_with('sso-profile')
+    assert credentials.sso_util.get_account_id.call_count == 1
+    credentials.sso_util.get_account_id.assert_called_with('GOODTOKEN')
+    assert credentials.sso_util.get_role_name.call_count == 1
+    credentials.sso_util.get_role_name.assert_called_with('GOODTOKEN', '111111111111')
+    assert credentials.sso_util.get_role_credentials.call_count == 1
+    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn)
 
 
 def test_should_store_session_creds_to_new_credentials_file(mocker):
@@ -62,9 +61,9 @@ def test_should_store_session_creds_to_new_credentials_file(mocker):
     credentials.store_default_role_session_credentials(cred)
 
     expected_cred_config = get_cred_config()
-    assert credentials.file_handler.get_credentials_config.call_count == 1 #pylint: disable=no-member
-    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config) #pylint: disable=no-member
-    assert credentials.file_handler.write_credentials_config.call_count == 1 #pylint: disable=no-member
+    assert credentials.file_handler.get_credentials_config.call_count == 1
+    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config)
+    assert credentials.file_handler.write_credentials_config.call_count == 1
 
 
 def test_should_store_session_creds_to_existing_credentials_file(mocker):
@@ -79,23 +78,28 @@ def test_should_store_session_creds_to_existing_credentials_file(mocker):
     credentials.store_default_role_session_credentials(cred)
 
     expected_cred_config = get_cred_config()
-    assert credentials.file_handler.get_credentials_config.call_count == 1 #pylint: disable=no-member
-    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config) #pylint: disable=no-member
-    assert credentials.file_handler.write_credentials_config.call_count == 1 #pylint: disable=no-member
+    assert credentials.file_handler.get_credentials_config.call_count == 1
+    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config)
+    assert credentials.file_handler.write_credentials_config.call_count == 1
 
 
 def test_should_print_environment_vars_to_stdout(capsys):
     cred = get_cred()
     credentials.print_export_strings(cred)
     captured = capsys.readouterr()
-    assert captured.out == "export AWS_ACCESS_KEY_ID='ASIAXXXXXXXXXXXXXXXX'\nexport AWS_SECRET_ACCESS_KEY='SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'\nexport AWS_SESSION_TOKEN='SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg='\n"
+    assert captured.out == "export AWS_ACCESS_KEY_ID='ASIAXXXXXXXXXXXXXXXX'\n" \
+        "export AWS_SECRET_ACCESS_KEY='SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'\n" \
+        "export AWS_SESSION_TOKEN='SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg='\n"
 
 
 def test_should_print_external_credential_process_to_stdout(capsys):
     cred = get_cred()
     credentials.print_credentials(cred)
     captured = capsys.readouterr()
-    assert captured.out == '{"Version":1,"AccessKeyId":"ASIAXXXXXXXXXXXXXXXX","SecretAccessKey":"SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX","SessionToken":"SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg=","Expiration":"2020-05-12T04:44:21+00:00"}\n'
+    assert captured.out == '{"Version":1,"AccessKeyId":"ASIAXXXXXXXXXXXXXXXX",' \
+        '"SecretAccessKey":"SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",' \
+        '"SessionToken":"SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg=",' \
+        '"Expiration":"2020-05-12T04:44:21+00:00"}\n'
 
 
 def test_should_store_external_credential_process_config():
@@ -122,7 +126,7 @@ def get_cred_config():
 
 def mock_test_access_token_response(access_token):
     if access_token == 'BADTOKEN':
-        raise Exception('Boom!')
+        raise ParamValidationError(report='')
     else:
         pass
 

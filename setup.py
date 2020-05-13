@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="aws_sso-kcerdena",
-    version="0.0.2",
+    version="0.0.3",
     author="Kacey Cerdena",
-    author_email="kacey.cerdena@outlook.com",
+    author_email="6180729+kcerdena@users.noreply.github.com",
     description="Session credential provider for AWS SSO roles",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -22,5 +22,5 @@ setuptools.setup(
         'python-dateutil>=2.8',
         'boto3>=1.13'
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6',
 )

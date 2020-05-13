@@ -1,4 +1,3 @@
-import sys
 import argparse
 from . import credentials
 from . import helper
@@ -45,4 +44,3 @@ if __name__ == '__main__':
                        help='Use as external credential provider. Implies -ns option')
     args = parser.parse_args()
     main(vars(args))
-

@@ -1,4 +1,3 @@
-import pytest
 import configparser
 from datetime import datetime, timezone, timedelta
 from aws_sso import file_handler
@@ -15,14 +14,14 @@ def test_get_sso_access_token_expired(tmp_path):
     f = tmp_path / "expired_token_file.json"
     f.write_text(expired_token_file)
     token = file_handler.get_sso_access_token(tmp_path)
-    assert token == None
+    assert token is None
 
 
 def test_get_sso_access_token_non_token(tmp_path):
     f = tmp_path / "non_token_file.json"
     f.write_text(non_token_file)
     token = file_handler.get_sso_access_token(tmp_path)
-    assert token == None
+    assert token is None
 
 
 def test_get_credentials_config_empty(tmp_path):
@@ -53,5 +52,3 @@ def today_with_delta(days_delta):
 expired_token_file = f'{{"accessToken": "ThisTokenIsExpired", "expiresAt": "{today_with_delta(-1)}"}}'
 valid_token_file = f'{{"accessToken": "ThisTokenIsValid", "expiresAt": "{today_with_delta(1)}"}}'
 non_token_file = f'{{"arbitraryKey": "arbitraryValue", "expiresAt": "{today_with_delta(1)}"}}'
-
-

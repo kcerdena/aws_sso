@@ -6,7 +6,8 @@ client = boto3.client('sso')
 
 
 def exec_login(sso_profile):
-    return subprocess.run([f'aws sso login --profile {sso_profile}'], shell=True, check=True, capture_output=True)
+    return subprocess.run([f'aws sso login --profile {sso_profile}'],
+                          shell=True, check=True, capture_output=True)
 
 
 def get_account_list(access_token):

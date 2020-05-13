@@ -10,7 +10,7 @@ def get_sso_access_token(cache_dir=None):
     keys = {'accessToken', 'expiresAt'}
     for file in __get_json_files(cache_dir):
         content = json.loads(__get_file_contents(file))
-        if content.keys() >= keys and helper.is_not_expired(content['expiresAt']):
+        if (content.keys() >= keys and helper.is_not_expired(content['expiresAt'])):
             return content['accessToken']
 
 
