@@ -9,7 +9,7 @@ def test_should_retrieve_creds_without_access_token(mocker):
     credentials.file_handler.get_sso_access_token.side_effect = ['BADTOKEN', 'GOODTOKEN']
     credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
     credentials.sso_util.get_role_credentials.side_effect = mock_get_role_credentials_response
-    role_arn = 'arn:aws:iam::111111111111:role/ReadOnly'
+    role_arn = get_readonly_role_arn()
 
     cred = credentials.get_role_session_credentials('sso-profile', role_arn)
 
@@ -34,7 +34,7 @@ def test_should_retrieve_creds_without_role_arn(mocker):
     credentials.sso_util.get_account_id.side_effect = mock_get_account_id
     credentials.sso_util.get_role_name.side_effect = mock_get_role_name
     credentials.sso_util.get_role_credentials.side_effect = mock_get_role_credentials_response
-    role_arn = 'arn:aws:iam::111111111111:role/ReadOnly'
+    role_arn = get_readonly_role_arn()
 
     cred = credentials.get_role_session_credentials('sso-profile')
 
@@ -103,7 +103,12 @@ def test_should_print_external_credential_process_to_stdout(capsys):
 
 
 def test_should_store_external_credential_process_config():
+    # todo: implement later
     pass
+
+
+def get_readonly_role_arn():
+    return 'arn:aws:iam::111111111111:role/ReadOnly'
 
 
 def get_cred():
@@ -112,7 +117,7 @@ def get_cred():
     cred['secretAccessKey'] = 'SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     cred['sessionToken'] = 'SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg='
     cred['expiration'] = 1589258661000
-    cred['role_arn'] = 'arn:aws:iam::111111111111:role/ReadOnly'
+    cred['role_arn'] = get_readonly_role_arn()
     return cred
 
 
@@ -127,12 +132,10 @@ def get_cred_config():
 def mock_test_access_token_response(access_token):
     if access_token == 'BADTOKEN':
         raise ParamValidationError(report='')
-    else:
-        pass
 
 
 def mock_get_role_credentials_response(access_token, role_arn):
-    if access_token == 'GOODTOKEN' and role_arn == 'arn:aws:iam::111111111111:role/ReadOnly':
+    if access_token == 'GOODTOKEN' and role_arn == get_readonly_role_arn():
         return get_cred()
     else:
         return None

@@ -22,7 +22,7 @@ def __get_json_files(dir):
             if file.suffix == '.json':
                 files.append(file)
     else:
-        raise Exception(f'Directory not found: {dir}')
+        raise NotADirectoryError(f'Directory not found: {dir}')
     return files
 
 
@@ -31,7 +31,7 @@ def __get_file_contents(file_path):
     if p.exists() and p.is_file():
         return p.read_text()
     else:
-        raise Exception(f'File not found: {file_path}')
+        raise FileNotFoundError(f'File not found: {file_path}')
 
 
 def get_credentials_config(credentials_file_path=None):

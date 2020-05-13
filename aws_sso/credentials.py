@@ -27,7 +27,7 @@ def __get_access_token(sso_profile):
             return access_token
         except (ParamValidationError, ClientError):
             if count >= 1:
-                raise Exception('Unable to retrieve SSO Access Token')
+                raise RuntimeError('Unable to retrieve SSO Access Token')
             else:
                 count += 1
                 sso_util.exec_login(sso_profile)
