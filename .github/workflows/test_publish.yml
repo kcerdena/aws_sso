@@ -24,4 +24,4 @@ jobs:
         TWINE_REPOSITORY: testpypi
       run: |
         python setup.py sdist bdist_wheel
-        twine upload dist/* --verbose
+        twine upload dist/*
