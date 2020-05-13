@@ -18,7 +18,7 @@ def get_account_list(access_token):
 def get_account_id(access_token):
     account_list = get_account_list(access_token)
     if len(account_list) == 0:
-        raise Exception('No accounts found')
+        raise IndexError('No accounts found')
     elif len(account_list) == 1:
         account = account_list[0]
     else:
@@ -43,7 +43,7 @@ def get_role_name(access_token, account_id):
     )
     role_list = response['roleList']
     if len(role_list) == 0:
-        raise Exception('No roles found')
+        raise IndexError('No roles found')
     elif len(role_list) == 1:
         role = role_list[0]
     else:

@@ -16,9 +16,7 @@ def main(args):
     if args['external_source']:
         credentials.print_credentials(cred)
     else:
-        if args['no_store_creds']:
-            pass
-        else:
+        if not args['no_store_creds']:
             credentials.store_default_role_session_credentials(cred)
             print(f'Temporary credentials added to {credentials_file_path}')
             print(f'Account: {account_id}')
