@@ -1,4 +1,3 @@
-from datetime import datetime
 from os import environ
 from datetime import datetime, timezone
 from dateutil import parser
@@ -27,15 +26,14 @@ def is_not_expired(expires_at):
 
 def minutes_from_now(expires_at):
     expiration_date = parser.parse(expires_at)
-    return int((expiration_date - datetime.now(timezone.utc)).total_seconds() / 60)
+    return int((expiration_date - datetime.now(timezone.utc))
+               .total_seconds() / 60)
 
 
 def get_env_var(env_var):
-    try:
+    if env_var in environ:
         val = environ[env_var]
-    except:
-        val = None
-    if val is None:
+    else:
         if env_var == 'AWS_CONFIG_FILE':
             val = '~/.aws/config'
         if env_var == 'AWS_SHARED_CREDENTIALS_FILE':

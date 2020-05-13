@@ -1,8 +1,8 @@
 import json
-import configparser
 from . import file_handler
 from . import sso_util
 from . import helper
+from botocore.exceptions import ParamValidationError, ClientError
 
 
 def get_role_session_credentials(sso_profile, role_arn=None):
@@ -25,7 +25,7 @@ def __get_access_token(sso_profile):
             # Verify access token is still valid
             sso_util.get_account_list(access_token)
             return access_token
-        except:
+        except (ParamValidationError, ClientError):
             if count >= 1:
                 raise Exception('Unable to retrieve SSO Access Token')
             else:
@@ -66,4 +66,3 @@ def print_credentials(cred):
         'Expiration': expiration_date.isoformat()
     }
     print(json.dumps(spec, separators=(',', ':')))
-
