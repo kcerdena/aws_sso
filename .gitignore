@@ -130,3 +130,6 @@ dmypy.json
 
 # ide
 .vscode
+junit/
+coverage-reports/
+lint/
