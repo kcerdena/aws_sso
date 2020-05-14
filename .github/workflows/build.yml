@@ -62,6 +62,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: coverage
+      - name: workdir discovery
+        run: |
+          pwd
+          ls -latr .
+          ls -latr ./aws_sso/
+          ls -latr ./tests/
+          ls -latr ./aws_sso/tests/
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         env:
