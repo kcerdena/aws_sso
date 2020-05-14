@@ -6,13 +6,13 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
     env:
       AWS_DEFAULT_REGION: us-west-2
+      PYTHON: ${{ matrix.python-version }}
 
     steps:
     - uses: actions/checkout@v2
@@ -32,14 +32,15 @@ jobs:
         # exit-zero treats all errors as warnings. 
         mkdir -p lint
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=119 --statistics --output=lint/flake8-${{ matrix.python-version }}.out
-    - name: Archive lint results
-      uses: actions/upload-artifact@v2
-      with:
-        name: lint
-        path: lint/flake8-*.out
     - name: Test with pytest
       run: |
         pytest tests/ --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=aws_sso --cov-report=xml:coverage-reports/coverage-${{ matrix.python-version }}.xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: coverage-reports/coverage-*.xml
+        env_vars: PYTHON
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:
@@ -50,3 +51,8 @@ jobs:
       with:
         name: junit
         path: junit/test-results-*.xml
+    - name: Archive lint results
+      uses: actions/upload-artifact@v2
+      with:
+        name: lint
+        path: lint/flake8-*.out
