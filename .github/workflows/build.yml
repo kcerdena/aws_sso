@@ -35,7 +35,7 @@ jobs:
     - name: Archive lint results
       uses: actions/upload-artifact@v2
       with:
-        name: lint-reports
+        name: lint
         path: lint/flake8-*.out
     - name: Test with pytest
       run: |
@@ -48,7 +48,7 @@ jobs:
     - name: Archive test coverage results
       uses: actions/upload-artifact@v2
       with:
-        name: test-reports
+        name: junit
         path: junit/test-results-*.xml
 
   sonarCloudTrigger:
@@ -58,21 +58,12 @@ jobs:
     steps:
       - name: Clone Repository
         uses: actions/checkout@v2
-      - name: Download lint-reports
+      - name: Download Artifacts
         uses: actions/download-artifact@v2
-        with:
-          name: lint-reports
-          path: lint/
-      - name: Download coverage-reports
-        uses: actions/download-artifact@v2
-        with:
-          name: coverage-reports
-          path: coverage-reports/
-      - name: Download test-reports
-        uses: actions/download-artifact@v2
-        with:
-          name: test-reports
-          path: junit/
+      - name: Display workdir
+        run: |
+          pwd
+          ls -R
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         env:
