@@ -50,22 +50,3 @@ jobs:
       with:
         name: junit
         path: junit/test-results-*.xml
-
-  sonarCloudTrigger:
-    needs: build
-    name: SonarCloud Trigger
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone Repository
-        uses: actions/checkout@v2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-      - name: Display workdir
-        run: |
-          pwd
-          ls -R
-      - name: Analyze with SonarCloud
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
