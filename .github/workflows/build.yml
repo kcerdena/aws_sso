@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
     env:
       AWS_DEFAULT_REGION: us-west-2
       PYTHON: ${{ matrix.python-version }}
@@ -36,11 +36,11 @@ jobs:
       run: |
         pytest tests/ --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=aws_sso --cov-report=xml:coverage-reports/coverage-${{ matrix.python-version }}.xml
     - name: Upload coverage to Codecov
+      if: matrix.python-version == 3.8
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: coverage-reports/coverage-*.xml
-        env_vars: PYTHON
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:
