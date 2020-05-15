@@ -40,7 +40,6 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         file: coverage-reports/coverage-*.xml
-        env_vars: PYTHON
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:
