@@ -4,6 +4,8 @@ Retrieves temporary credentials for programmatic access using AWS SSO roles.
 
 [![build](https://img.shields.io/github/workflow/status/kcerdena/aws_sso/build?style=plastic)](https://github.com/kcerdena/aws_sso/actions?query=workflow%3Abuild)
 [![Codecov](https://img.shields.io/codecov/c/github/kcerdena/aws_sso?style=plastic&token=91b2881bcee24aeda75bf2f9ad4b0f59)](https://codecov.io/gh/kcerdena/aws_sso)
+[![PyPI](https://img.shields.io/pypi/v/aws-sso-credential-provider?style=plastic)](https://pypi.org/project/aws-sso-credential-provider/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sso-credential-provider?style=plastic)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=alert_status)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso)
