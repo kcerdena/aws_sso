@@ -35,12 +35,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest tests/ --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=aws_sso --cov-report=xml:coverage-reports/coverage-${{ matrix.python-version }}.xml
-    - name: Upload coverage to Codecov
-      if: matrix.python-version == 3.8
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: coverage-reports/coverage-*.xml
     - name: Archive code coverage results
       uses: actions/upload-artifact@v2
       with:
