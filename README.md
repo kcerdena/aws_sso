@@ -3,17 +3,21 @@
 Retrieves temporary credentials for programmatic access using AWS SSO roles.
 
 [![build](https://img.shields.io/github/workflow/status/kcerdena/aws_sso/build?style=plastic)](https://github.com/kcerdena/aws_sso/actions?query=workflow%3Abuild) [![Codecov](https://img.shields.io/codecov/c/github/kcerdena/aws_sso?style=plastic&token=91b2881bcee24aeda75bf2f9ad4b0f59)](https://codecov.io/gh/kcerdena/aws_sso) [![PyPI](https://img.shields.io/pypi/v/aws-sso-credential-provider?style=plastic)](https://pypi.org/project/aws-sso-credential-provider/) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aws-sso-credential-provider?style=plastic)
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=alert_status)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso) [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=security_rating)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso) [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=kcerdena_aws_sso&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=kcerdena_aws_sso)
 
 
 ## Overview
 So, you've decided to use [AWS Single Sign-On](https://aws.amazon.com/single-sign-on/) to manage user authentication for multiple AWS accounts. Great idea! Now you can centrally manage user access permissions using the directory of your choosing. As a systems administrator, you're using [AWS CLI version 2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) with [named profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) to interact with your accounts. Now your custom automation programs fail and are unable to locate credentials!
+
 Named profiles configured for SSO are [only usable by AWS CLIv2](https://docs.aws.amazon.com/credref/latest/refdocs/setting-global-sso_start_url.html). That means your automation using boto3 or other AWS SDK clients fail authentication when referencing these profiles.
+
 This python module solves that problem by retrieving [AWS STS temporary security credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) for your chosen AWS SSO Role.
 
 ## Installation
 -Requires installation of [AWS CLI version 2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) for SSO login support.
--Requires configuration of (1) [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) per SSO directory credential. This profile can be configured with any account and role that your SSO credentials have access to. However, its recommended you use the lowest permissioned role available. Example aws config file (~/.aws/config) profile:
+
+-Requires configuration of (1) [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html) per SSO directory credential. This profile can be configured with any account and role your SSO credentials provide access to. However, it is recommended you use the lowest permissioned role available. Example aws config file (~/.aws/config) profile:
 ```text
 [profile SSO_PROFILE]
 sso_start_url = https://my-sso-portal.awsapps.com/start
@@ -27,7 +31,7 @@ pip install aws-sso-credential-provider
 ```
 
 ## Detail
-This python module uses the cached AWS SSO access token to retrieve STS short-term credentials for a specified role. 
+This python module uses the cached AWS SSO access token to retrieve STS short-term credentials for a specified role.
 If the SSO access token is expired, the python module shells out to execute `aws sso login --profile SSO_PROFILE` and renews the token.
 
 ## Usage
@@ -74,9 +78,9 @@ Environment variables are not available outside the current shell.
 eval "$(python3 -m aws_sso -p SSO_PROFILE -r ROLEARN -env -ns)"
 ```
 Exports these environment variables:
-*AWS_ACCESS_KEY_ID*
-*AWS_SECRET_ACCESS_KEY*
-*AWS_SESSION_TOKEN*
+- *AWS_ACCESS_KEY_ID*
+- *AWS_SECRET_ACCESS_KEY*
+- *AWS_SESSION_TOKEN*
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
