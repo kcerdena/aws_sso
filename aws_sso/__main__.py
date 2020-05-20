@@ -1,32 +1,40 @@
 import argparse
 import re
+import sys
 from . import credentials
 from . import helper
 
 
 def main(args):
+    if args['discover_roles']:
+        credentials.store_awsconfig_external_provider_profiles(args['profile'])
+        config_file_path = helper.get_env_var('AWS_CONFIG_FILE', None)
+        print(f'Updated named profiles with external credential provider in: {config_file_path}')
+        sys.exit()
+
     cred = credentials.get_role_session_credentials(
         args['profile'], args['rolearn']
     )
+
+    if args['external_source'] and args['rolearn']:
+        credentials.print_credentials(cred)
+        sys.exit()
+
+    if args['env_vars']:
+        credentials.print_export_strings(cred)
+        sys.exit()
+
+    credentials.store_default_role_session_credentials(cred)
+
+    credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE', None)
     account_id = helper.parse_role_arn(cred['role_arn'])['account_id']
     role_name = helper.parse_role_arn(cred['role_arn'])['role_name']
     expiration = helper.int_to_datetime(cred['expiration']).isoformat()
     x_minutes = helper.minutes_from_now(expiration)
-    credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE', None)
-
-    if args['external_source']:
-        credentials.print_credentials(cred)
-    elif args['discover_roles']:
-        credentials.store_awsconfig_external_provider_profiles(args['profile'])
-    else:
-        if not args['no_store_creds']:
-            credentials.store_default_role_session_credentials(cred)
-            print(f'Temporary credentials added to {credentials_file_path}')
-            print(f'Account: {account_id}')
-            print(f'Role:    {role_name}')
-            print(f'Expires: {expiration} ({x_minutes}m)')
-        if args['env_vars']:
-            credentials.print_export_strings(cred)
+    print(f'Temporary credentials added to {credentials_file_path}')
+    print(f'Account: {account_id}')
+    print(f'Role:    {role_name}')
+    print(f'Expires: {expiration} ({x_minutes}m)')
 
 
 def validate_input(arg, input):
@@ -48,15 +56,13 @@ if __name__ == '__main__':
                         help='Named profile for AWS SSO login')
     parser.add_argument('-r', '--rolearn',
                         help='RoleArn for session credentials')
-    parser.add_argument('-ns', '--no-store-creds', action='store_true',
-                        help='Disable output of session credential to AWS_SHARED_CREDENTIALS_FILE')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-env', '--env_vars', action='store_true',
-                       help='Output session credential environment variable export strings')
+                       help='Environment variable export strings to stdout')
     group.add_argument('-ext', '--external-source', action='store_true',
-                       help='Use as external credential provider. Implies -ns option')
-    parser.add_argument('-d', '--discover-roles', action='store_true',
-                        help='Discover assumable SSO roles and create external credential provider profiles for all.')
+                       help='Use as external credential provider, Requires --rolearn')
+    group.add_argument('-d', '--discover-roles', action='store_true',
+                       help='Discover SSO roles and create external credential provider profiles in AWS_CONFIG_FILE')
     args = parser.parse_args()
     arg_dict = vars(args)
 
