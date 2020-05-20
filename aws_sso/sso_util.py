@@ -36,12 +36,16 @@ def __select_account(account_list):
     return account_list[index]
 
 
-def get_role_name(access_token, account_id):
+def get_role_list(access_token, account_id):
     response = client.list_account_roles(
         accessToken=access_token,
         accountId=account_id
     )
-    role_list = response['roleList']
+    return response['roleList']
+
+
+def get_role_name(access_token, account_id):
+    role_list = get_role_list(access_token, account_id)
     if len(role_list) == 0:
         raise IndexError('No roles found')
     elif len(role_list) == 1:
@@ -87,3 +91,11 @@ def get_role_credentials(access_token, role_arn):
     )
     response['roleCredentials']['role_arn'] = role_arn
     return response['roleCredentials']
+
+
+def get_rolearn_list(access_token):
+    role_arn_list = []
+    for account in get_account_list(access_token):
+        for role in get_role_list(access_token, account):
+            role_arn_list.append(helper.get_role_arn(account, role))
+    return role_arn_list
