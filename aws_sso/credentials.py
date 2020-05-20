@@ -82,5 +82,7 @@ def __append_external_provider_profile(sso_profile, role_arn, config):
     role_name = helper.parse_role_arn(role_arn)['role_name']
     profile_name = f'{account_id}_{role_name}'
     execution_string = f'python3 -m aws_sso -p {sso_profile} -r {role_arn} -ext'
+    if profile_name not in config.sections():
+        config.add_section(profile_name)
     config[profile_name]['credential_process'] = execution_string
     return config

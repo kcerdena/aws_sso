@@ -6,7 +6,8 @@ from botocore.exceptions import ParamValidationError
 def test_should_retrieve_creds_without_access_token(mocker):
     mocker.patch.object(credentials, 'file_handler')
     mocker.patch.object(credentials, 'sso_util')
-    credentials.file_handler.get_sso_access_token.side_effect = ['BADTOKEN', 'GOODTOKEN']
+    credentials.file_handler.get_sso_access_token.side_effect = [
+        'BADTOKEN', 'GOODTOKEN']
     credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
     credentials.sso_util.get_role_credentials.side_effect = mock_get_role_credentials_response
     role_arn = get_readonly_role_arn()
@@ -23,13 +24,15 @@ def test_should_retrieve_creds_without_access_token(mocker):
     assert credentials.sso_util.get_role_name.call_count == 0
     assert credentials.sso_util.get_role_arn.call_count == 0
     assert credentials.sso_util.get_role_credentials.call_count == 1
-    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn)
+    credentials.sso_util.get_role_credentials.assert_called_with(
+        'GOODTOKEN', role_arn)
 
 
 def test_should_retrieve_creds_without_role_arn(mocker):
     mocker.patch.object(credentials, 'file_handler')
     mocker.patch.object(credentials, 'sso_util')
-    credentials.file_handler.get_sso_access_token.side_effect = ['BADTOKEN', 'GOODTOKEN']
+    credentials.file_handler.get_sso_access_token.side_effect = [
+        'BADTOKEN', 'GOODTOKEN']
     credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
     credentials.sso_util.get_account_id.side_effect = mock_get_account_id
     credentials.sso_util.get_role_name.side_effect = mock_get_role_name
@@ -47,9 +50,11 @@ def test_should_retrieve_creds_without_role_arn(mocker):
     assert credentials.sso_util.get_account_id.call_count == 1
     credentials.sso_util.get_account_id.assert_called_with('GOODTOKEN')
     assert credentials.sso_util.get_role_name.call_count == 1
-    credentials.sso_util.get_role_name.assert_called_with('GOODTOKEN', '111111111111')
+    credentials.sso_util.get_role_name.assert_called_with(
+        'GOODTOKEN', '111111111111')
     assert credentials.sso_util.get_role_credentials.call_count == 1
-    credentials.sso_util.get_role_credentials.assert_called_with('GOODTOKEN', role_arn)
+    credentials.sso_util.get_role_credentials.assert_called_with(
+        'GOODTOKEN', role_arn)
 
 
 def test_should_store_session_creds_to_new_credentials_file(mocker):
@@ -62,7 +67,8 @@ def test_should_store_session_creds_to_new_credentials_file(mocker):
 
     expected_cred_config = get_cred_config()
     assert credentials.file_handler.get_credentials_config.call_count == 1
-    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config)
+    credentials.file_handler.write_credentials_config.assert_called_with(
+        expected_cred_config)
     assert credentials.file_handler.write_credentials_config.call_count == 1
 
 
@@ -79,7 +85,8 @@ def test_should_store_session_creds_to_existing_credentials_file(mocker):
 
     expected_cred_config = get_cred_config()
     assert credentials.file_handler.get_credentials_config.call_count == 1
-    credentials.file_handler.write_credentials_config.assert_called_with(expected_cred_config)
+    credentials.file_handler.write_credentials_config.assert_called_with(
+        expected_cred_config)
     assert credentials.file_handler.write_credentials_config.call_count == 1
 
 
@@ -102,9 +109,43 @@ def test_should_print_external_credential_process_to_stdout(capsys):
         '"Expiration":"2020-05-12T04:44:21+00:00"}\n'
 
 
-def test_should_store_external_credential_process_config():
-    # todo: implement later
-    pass
+def test_should_store_external_credential_provider_profiles(mocker):
+    mocker.patch.object(credentials, 'file_handler')
+    mocker.patch.object(credentials, 'sso_util')
+    credentials.file_handler.get_sso_access_token.side_effect = ['GOODTOKEN']
+    credentials.sso_util.get_account_list.side_effect = mock_test_access_token_response
+    credentials.sso_util.get_rolearn_list.return_value = get_rolearn_list_test_data()
+    credentials.file_handler.get_awsconfig_config.return_value = get_config()
+
+    credentials.store_awsconfig_external_provider_profiles('sso-profile')
+
+    credentials.file_handler.write_awsconfig_config.assert_called_with(
+        get_expected_awsconfig())
+
+
+def get_expected_awsconfig():
+    config = get_config()
+    config.add_section('111111111111_ReadOnly')
+    config['111111111111_ReadOnly']['credential_process'] = \
+        'python3 -m aws_sso -p sso-profile -r arn:aws:iam::111111111111:role/ReadOnly -ext'
+    config.add_section('111111111111_Admin')
+    config['111111111111_Admin']['credential_process'] = \
+        'python3 -m aws_sso -p sso-profile -r arn:aws:iam::111111111111:role/Admin -ext'
+    config.add_section('222222222222_ReadOnly')
+    config['222222222222_ReadOnly']['credential_process'] = \
+        'python3 -m aws_sso -p sso-profile -r arn:aws:iam::222222222222:role/ReadOnly -ext'
+    config.add_section('222222222222_Admin')
+    config['222222222222_Admin']['credential_process'] = \
+        'python3 -m aws_sso -p sso-profile -r arn:aws:iam::222222222222:role/Admin -ext'
+    return config
+
+
+def get_rolearn_list_test_data():
+    return ['arn:aws:iam::111111111111:role/ReadOnly',
+            'arn:aws:iam::111111111111:role/Admin',
+            'arn:aws:iam::222222222222:role/ReadOnly',
+            'arn:aws:iam::222222222222:role/Admin'
+            ]
 
 
 def get_readonly_role_arn():
@@ -121,8 +162,12 @@ def get_cred():
     return cred
 
 
+def get_config():
+    return configparser.ConfigParser(default_section='default')
+
+
 def get_cred_config():
-    config = configparser.ConfigParser(default_section='default')
+    config = get_config()
     config['default']['aws_access_key_id'] = 'ASIAXXXXXXXXXXXXXXXX'
     config['default']['aws_secret_access_key'] = 'SAK_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     config['default']['aws_session_token'] = 'SessionToken_/ZwhaXZU0E2JRVqcg9ESMr6XNg='
