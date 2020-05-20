@@ -66,3 +66,21 @@ def print_credentials(cred):
         'Expiration': expiration_date.isoformat()
     }
     print(json.dumps(spec, separators=(',', ':')))
+
+
+def store_awsconfig_external_provider_profiles(sso_profile):
+    access_token = __get_access_token(sso_profile)
+    role_arn_list = sso_util.get_rolearn_list(access_token)
+    config = file_handler.get_awsconfig_config()
+    for role_arn in role_arn_list:
+        config = __append_external_provider_profile(sso_profile, role_arn, config)
+    file_handler.write_awsconfig_config(config)
+
+
+def __append_external_provider_profile(sso_profile, role_arn, config):
+    account_id = helper.parse_role_arn(role_arn)['account_id']
+    role_name = helper.parse_role_arn(role_arn)['role_name']
+    profile_name = f'{account_id}_{role_name}'
+    execution_string = f'python3 -m aws_sso -p {sso_profile} -r {role_arn} -ext'
+    config[profile_name]['credential_process'] = execution_string
+    return config

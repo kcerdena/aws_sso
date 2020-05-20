@@ -34,20 +34,36 @@ def __get_file_contents(file_path):
         raise FileNotFoundError(f'File not found: {file_path}')
 
 
-def get_credentials_config(credentials_file_path=None):
-    if credentials_file_path is None:
-        credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE')
+def get_credentials_config(file_path=None):
+    file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE', file_path)
+    return __get_config(file_path)
+
+
+def write_credentials_config(config, file_path=None):
+    file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE', file_path)
+    __write_config(config, file_path)
+
+
+def get_awsconfig_config(file_path=None):
+    file_path = helper.get_env_var('AWS_CONFIG_FILE', file_path)
+    return __get_config(file_path)
+
+
+def write_awsconfig_config(config, file_path=None):
+    file_path = helper.get_env_var('AWS_CONFIG_FILE', file_path)
+    __write_config(config, file_path)
+
+
+def __get_config(file_path):
     config = configparser.ConfigParser(default_section='default')
-    p = Path(credentials_file_path).expanduser()
+    p = Path(file_path).expanduser()
     if p.exists() and p.is_file():
         with p.open() as f:
             config.read_file(f)
     return config
 
 
-def write_credentials_config(config, credentials_file_path=None):
-    if credentials_file_path is None:
-        credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE')
-    p = Path(credentials_file_path).expanduser()
+def __write_config(config, file_path):
+    p = Path(file_path).expanduser()
     with p.open(mode='w') as f:
         config.write(f)

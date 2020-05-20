@@ -25,6 +25,8 @@ def main(args):
             print(f'Expires: {expiration} ({x_minutes}m)')
         if args['env_vars']:
             credentials.print_export_strings(cred)
+        if args['discover_roles']:
+            credentials.store_awsconfig_external_provider_profiles(args['profile'])
 
 
 def validate_input(arg, input):
@@ -53,6 +55,8 @@ if __name__ == '__main__':
                        help='Output session credential environment variable export strings')
     group.add_argument('-ext', '--external-source', action='store_true',
                        help='Use as external credential provider. Implies -ns option')
+    parser.add_argument('-d', '--discover-roles', action='store_true',
+                        help='Discover assumable SSO roles and create external credential provider profiles for all.')
     args = parser.parse_args()
     arg_dict = vars(args)
 

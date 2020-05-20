@@ -30,7 +30,14 @@ def minutes_from_now(expires_at):
                .total_seconds() / 60)
 
 
-def get_env_var(env_var):
+def get_env_var(env_var, file_path):
+    if file_path is None:
+        return __get_env_var(env_var)
+    else:
+        return file_path
+
+
+def __get_env_var(env_var):
     if env_var in environ:
         val = environ[env_var]
     else:
