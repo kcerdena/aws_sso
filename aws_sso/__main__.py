@@ -10,9 +10,9 @@ def main(args):
     )
     account_id = helper.parse_role_arn(cred['role_arn'])['account_id']
     role_name = helper.parse_role_arn(cred['role_arn'])['role_name']
-    expiration = helper.int_to_datetime(cred["expiration"]).isoformat()
+    expiration = helper.int_to_datetime(cred['expiration']).isoformat()
     x_minutes = helper.minutes_from_now(expiration)
-    credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE')
+    credentials_file_path = helper.get_env_var('AWS_SHARED_CREDENTIALS_FILE', None)
 
     if args['external_source']:
         credentials.print_credentials(cred)
