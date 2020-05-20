@@ -125,17 +125,17 @@ def test_should_store_external_credential_provider_profiles(mocker):
 
 def get_expected_awsconfig():
     config = get_config()
-    config.add_section('111111111111_ReadOnly')
-    config['111111111111_ReadOnly']['credential_process'] = \
+    config.add_section('profile 111111111111-ReadOnly')
+    config['profile 111111111111-ReadOnly']['credential_process'] = \
         'python3 -m aws_sso -p sso-profile -r arn:aws:iam::111111111111:role/ReadOnly -ext'
-    config.add_section('111111111111_Admin')
-    config['111111111111_Admin']['credential_process'] = \
+    config.add_section('profile 111111111111-Admin')
+    config['profile 111111111111-Admin']['credential_process'] = \
         'python3 -m aws_sso -p sso-profile -r arn:aws:iam::111111111111:role/Admin -ext'
-    config.add_section('222222222222_ReadOnly')
-    config['222222222222_ReadOnly']['credential_process'] = \
+    config.add_section('profile 222222222222-ReadOnly')
+    config['profile 222222222222-ReadOnly']['credential_process'] = \
         'python3 -m aws_sso -p sso-profile -r arn:aws:iam::222222222222:role/ReadOnly -ext'
-    config.add_section('222222222222_Admin')
-    config['222222222222_Admin']['credential_process'] = \
+    config.add_section('profile 222222222222-Admin')
+    config['profile 222222222222-Admin']['credential_process'] = \
         'python3 -m aws_sso -p sso-profile -r arn:aws:iam::222222222222:role/Admin -ext'
     return config
 
