@@ -16,6 +16,8 @@ def main(args):
 
     if args['external_source']:
         credentials.print_credentials(cred)
+    elif args['discover_roles']:
+        credentials.store_awsconfig_external_provider_profiles(args['profile'])
     else:
         if not args['no_store_creds']:
             credentials.store_default_role_session_credentials(cred)
@@ -25,8 +27,6 @@ def main(args):
             print(f'Expires: {expiration} ({x_minutes}m)')
         if args['env_vars']:
             credentials.print_export_strings(cred)
-        if args['discover_roles']:
-            credentials.store_awsconfig_external_provider_profiles(args['profile'])
 
 
 def validate_input(arg, input):
