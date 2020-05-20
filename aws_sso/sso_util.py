@@ -95,7 +95,10 @@ def get_role_credentials(access_token, role_arn):
 
 def get_rolearn_list(access_token):
     role_arn_list = []
-    for account in get_account_list(access_token):
-        for role in get_role_list(access_token, account['accountId']):
-            role_arn_list.append(helper.get_role_arn(account, role['roleName']))
+    for account_object in get_account_list(access_token):
+        account_id = account_object['accountId']
+        for role_object in get_role_list(access_token, account_id):
+            role_name = role_object['roleName']
+            role_arn = helper.get_role_arn(account_id, role_name)
+            role_arn_list.append(role_arn)
     return role_arn_list
