@@ -43,6 +43,25 @@ def test_read_write_credentials_config(tmp_path):
     assert 'key2 = value2' in content
 
 
+def test_get_awsconfig_config_empty(tmp_path):
+    f = tmp_path / "config"
+    config_file = file_handler.get_awsconfig_config(f)
+    assert isinstance(config_file, configparser.ConfigParser)
+    assert 1 == len(config_file.items())
+
+
+def test_read_write_awsconfig_config(tmp_path):
+    f = tmp_path / "config"
+    f.write_text("[default]\nkey5 = value3\n\n[section1]\nkey1 = value1\n\n")
+    config_file = file_handler.get_awsconfig_config(f)
+    assert config_file.defaults()['key5'] == 'value3'
+    assert config_file['section1']['key1'] == 'value1'
+    config_file['section1']['key2'] = 'value2'
+    file_handler.write_awsconfig_config(config_file, f)
+    content = f.read_text()
+    assert 'key2 = value2' in content
+
+
 def today_with_delta(days_delta):
     format = '%Y-%m-%dT%H:%M:%S%Z'
     test_date = datetime.now(timezone.utc) + timedelta(days=days_delta)
